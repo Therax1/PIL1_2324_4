@@ -1,0 +1,156 @@
+*{
+    font-family: "Poppins", sans-serif;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(32deg,#d6e1e8 -.84%,rgba(214,225,232,0) 39%),linear-gradient(103.83deg,#c9d7f0 8.13%,#d4d2e9 33.38%,#dadaf4 50.11%,#e8d3dd 81.31%);
+    height: 100vh;
+}
+h1{
+    align-self: flex-start;
+}
+.container h3{
+    color: #000000;
+    text-indent: 12px ;
+}
+.container{
+    background: linear-gradient(32deg,#d6e1e8 -.84%,rgba(214,225,232,0) 39%),linear-gradient(103.83deg,#c9d7f0 8.13%,#d4d2e9 33.38%,#dadaf4 50.11%,#e8d3dd 81.31%);
+    width: 65%;
+    height: 60%;
+    border: none;
+    outline: none;
+    border-radius: 60px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 4px 4px 30px #00000045;
+    animation-name: fadeIn;
+    animation-duration: 1s;
+}
+
+form{
+    display: flex;
+}
+
+.content{
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+/* Animation du container */
+@keyframes fadeIn {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+/* Première colonne du forulaire  */
+.container .col1{
+    width: 50%;
+    padding: 50px;
+}
+.container .col1 input{
+    outline: none;
+    border: none;
+    width: 80%;
+    height: 50px;
+    border-radius: 30px;
+    text-indent: 12px;
+    font-size: large;
+    font-weight: 500;
+}
+
+/* Deuxième colonne du formulaire */
+.container .col2{
+    width: 50%;
+    padding: 50px;  
+}
+
+.container .col2 input#pwd{
+    outline: none;
+    border: none;
+    width: 80%;
+    height: 50px;
+    border-radius: 30px;
+    text-indent: 12px;
+    font-size: large;
+    font-weight: 500;
+    animation: 1s ease-out;
+}
+
+.div-accept{
+    margin-top: 50px;
+    display: flex;
+}
+.div-accept #politics{
+    text-indent: 12px;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.div-accept p{
+    margin: 0;  
+    font-size: 12px;
+}
+.div-accept p span.brand{
+    font-family: "Chewy", sans-serif;
+    font-size: 18px;
+}
+/* Les placeholder des inputs  */
+.container .col1  input::placeholder{
+    font-weight: 600;
+}
+.container .col2  input::placeholder{
+    font-weight: 600;
+}
+/* Pour les conditions d'utilisation */
+
+
+/* Pour le boutton de la page d'inscription */
+.div-button{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-around;
+}
+
+.div-button button{
+    outline: none;
+    border: none;
+    padding: 0;
+    height: 50px;
+    width: 90px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transform: translate(80px, 15px);
+    transition: 2s;
+    font-size: 16px;
+    box-shadow: 1px 1px 10px #0000003b;
+}
+.div-button button:hover{
+    background-color: #d4d2e9;
+}
+.div-button button a{
+    text-decoration: none;
+    color: #000;
+}
+
+.messages {
+    background-color: rgb(0, 238, 255);
+    padding: 10px;
+    font-weight: bold ;
+    border-radius: 15 px ;
+}
+
+.alert-danger {
+    background-color: red;
+    padding: 10px;
+    font-weight: bold ;
+    border-radius: 15 px ;
+}

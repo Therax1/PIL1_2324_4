@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil| Venus</title>
+    <link rel="stylesheet" href="{% static 'css/accueil.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body> 
+    <nav class="navbar">
+        <ul style="display: flex; width: 100%;">
+            <li><a href="accueil.html" class="itemss">Accueil</a></li>
+            <li><a href="{% url 'SignIn' %}" class="itemss">Explorer</a></li>
+            <li><a href="{% url 'SignIn' %}" class="itemss"><img src="{% static 'img/pngn.png' %}" alt="our logo"></a></li>
+            <li><a href="{% url 'SignIn' %}" class="itemss">Contacts</a></li>
+            <li><a href="{% url 'SignIn' %}" class="itemss">Login</a></li>
+            <!-- <li><a href="#" class="itemss"><i class='bx bx-bell'></i></a></li> -->
+        </ul>
+    </nav>
+    <br> <br>
+    <div class="introducing-explore">
+        <img src="{% static 'img/Backgroung/3.jpg' %}" alt="Explore-introducing">
+        <div class="pannel">
+            <p>
+                Découvrez des profils captivants et authentiques sur notre plateforme. <br>Cliquez sur
+            </p>
+            <button class="explorer">Explorer</button>
+        </div>
+    </div>
+    <br><br>
+    <main class="introducing">
+        <p class="Accrocheur">
+            Chaque personne ici a ses propres passions et histoires à partager.
+            Que vous soyez à la recherche d’une âme sœur qui partage votre amour pour la nature, un fin gourmet pour
+            expérimenter de nouvelles recettes, ou un compagnon de randonnée pour explorer des sentiers inconnus, vous
+            êtes au bon endroit.
+            Commencez par <a href="#">Explorer</a> et créer des souvenirs inoubliables avec des personnes qui vous
+            ressemblent et vous inspirent.
+            Laissez-vous surprendre par des rencontres sincères et enrichissantes. Faites le premier pas vers une
+            nouvelle aventure humaine !
+        </p>
+    </main> <br> <br>
+    <div class="container">
+        <div class="container1">
+            <div class="image1">
+                <img src="{% static 'img/Personne/a1V2.jpg' %}" alt="Femme">
+                <h3>Alice(23 ans)</h3>
+            </div>
+            <div class="profile-nav">
+                <p>
+                    Salut, moi c’est Alice ! J'ai 23 ans et je suis une grande passionnée de lecture.
+                    J'adore me plonger dans des romans captivants et découvrir de nouveaux auteurs.
+                </p>
+            </div>
+        </div>
+        <div class="container2">
+            <div class="image2">
+                <img src="{% static 'img/Personne/a2V2.jpeg' %}" alt="Femme">
+            </div>
+            <div class="profile-nav2">
+                <p>
+                    Salut, moi c’est Alice ! J'ai 23 ans et je suis une grande passionnée de lecture.
+                    J'adore me plonger dans des romans captivants et découvrir de nouveaux auteurs.
+                </p>
+            </div>
+        </div>
+        <div class="container3">
+            <div class="image3">
+                <img src="{% static 'img/Personne/a6V2.jpeg' %}" alt="Femme">
+            </div>
+            <div class="profile-nav3">
+                <p>
+                    Salut, moi c’est Alice ! J'ai 23 ans et je suis une grande passionnée de lecture.
+                    J'adore me plonger dans des romans captivants et découvrir de nouveaux auteurs.
+                </p>
+            </div>
+        </div>
+        <div class="container4">
+            <div class="image4">
+                <img src="{% static 'img/Personne/a4V2.jpeg' %}" alt="Femme">
+            </div>
+            <div class="profile-nav4">
+                <p>
+                    Salut, moi c’est Alice ! J'ai 23 ans et je suis une grande passionnée de lecture.
+                    J'adore me plonger dans des romans captivants et découvrir de nouveaux auteurs.
+                </p>
+            </div>
+        </div>
+        <div class="container5">
+            <div class="image5">
+                <img src="{% static 'img/Personne/a5V2.jpeg' %}" alt="Femme">
+            </div>
+            <div class="profile-nav5">
+                <p>
+                    Salut, moi c’est Alice ! J'ai 23 ans et je suis une grande passionnée de lecture.
+                    J'adore me plonger dans des romans captivants et découvrir de nouveaux auteurs.
+                </p>
+            </div>
+        </div> <br> <br> <br>
+        <div class="avis">
+            <p class="avis-text">
+                IlS NOUS ON FAIT CONFIANCE
+            </p>
+        </div>
+    </div> <br><br><br><br><br><br>
+    <div class="image-down">
+        <div class="avi1">
+            <img class="avis1" src="{% static 'img/Personne/avis1.jpg' %}" alt="Temoignage">
+            <p>
+                <span class="names">Aurelie & Laurent</span> <br>
+                Lorem ipsum, dipisicing elit. Voluptatibus facilis et aspernatur ea iste nobis laborum, s cum m
+            </p>
+        </div>
+        <div class="avi2">
+            <img class="avis2" src="{% static 'img/Personne/avis3.jpg' %}" alt="Temoignage">
+            <p>
+                <span class="name1">Juliette & Shadrack</span> <br>
+                Lorem ipsum, dipisicing elit. Voluptatibus facilis et aspernatur ea iste nobis laborum, s cum m
+            </p>
+        </div>
+        <div class="avi3">
+            <img class="avis3" src="{% static 'img/Personne/avis2.jpg' %}" alt="Temoignage">
+            <p>
+                <span class="name2">Juliette & Shadrack</span> <br>
+                Lorem ipsum, dipisicing elit. Voluptatibus facilis et aspernatur ea iste nobis laborum, s cum m
+            </p>
+        </div>
+    </div> <br> <br>
+    <footer class="footer">
+        <div class="f footer-col1">
+            <h4>Notre Entreprise</h4>
+            <ul class="links">
+                <li><a href="#">A propos</a></li>
+                <li><a href="#">Nos Services</a></li>
+                <li><a href="#">Confidentialités</a></li>
+                <li><a href="#">Affiliation</a></li>
+            </ul>
+        </div>
+        <div class="f footer-col2">
+            <h4>Aide</h4>
+            <ul class="links">
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Temoignages</a></li>
+                <li><a href="#">Status du site</a></li>
+                <li><a href="#">Paiements</a></li>
+            </ul>
+        </div>
+        <div class="f footer-col3">
+            <h4>Suivez-nous</h4>
+            <ul class="footer-ico">
+                <li><a href="https://github.com/Bsh54/PIGP4.git" target="_blank"><i class='bx bxl-github'></i></a></li>
+                <li><a href="#"><i class='bx bxl-instagram'></i></a></li>
+                <li><a href="#"><i class='bx bxl-facebook-circle'></i></a></li>
+                <li><a href="#"><i class='bx bxl-twitter'></i></a></li>
+            </ul>
+        </div>
+        <div class="footer-col4">
+            <ul>
+                <li><a href="#"><img src="img/needed/Google-Play-Logo-PNG-Image.png" alt=""></a></li>
+            </ul>
+        </div>
+    </footer>
+    <script src="{% static 'js/accueil.js' %}">
+        
+    </script>
+</body>
+</html>

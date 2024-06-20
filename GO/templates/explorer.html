@@ -1,0 +1,103 @@
+<!DOCTYPE html >
+<html lang="fr" >
+    <head>
+        {% load static %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Suggestions</title>
+        <link rel="stylesheet" href="{% static 'css/explore.css' %}">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    </head>
+    <body >
+        
+        <nav class="navbar">
+            <div class="brand-name">
+                <h2 class="Logo">Venus</h2>
+            </div>
+            <div class="nav">
+                <a href="{% url 'acceuil-connect' %}"><i class='bx bxs-home'></i></a>
+                <a href="{% url 'explorer' %}"><i class='bx bxs-news' ></i></a>
+                <a href="#"><i class='bx bx-message-square-dots' ></i></a>
+                <a href="{% url 'deconnexion' %}"><i class='bx bx-log-out'></i></a>
+            </div>
+
+        </nav>
+        <br> <br><br>
+        <div class="container">
+            <div class="profile-card" id="profile-card-1">
+                <img src="{% static 'img/explorer/profile1.jpg' %}" alt="Photo de profil">
+                <div class="profile-info">
+                    <h2>Alice</h2>
+                    <p>25 ans</p>
+                </div>
+                <button class="details-button" onclick="toggleDetails(1)">°°°</button>
+            </div>
+            <div class="profile-card" id="profile-card-2" >
+                <img src="{% static 'img/explorer/profile2.jpg' %}" alt="Photo de profil">
+                <div class="profile-info">
+                    <h2>Bob</h2>
+                    <p>28 ans</p>
+                </div>
+                <button class="details-button" onclick="toggleDetails(2)">°°°</button>
+            </div>
+            <div class="profile-card" id="profile-card-3" >
+                <img src="{% static 'img/explorer/profile3.jpg' %}" alt="Photo de profil">
+                <div class="profile-info">
+                    <h2>Charlie</h2>
+                    <p>30 ans</p>
+                </div>
+                <button class="details-button" onclick="toggleDetails(3)">°°°</button>
+            </div>
+
+            <div class="buttons">
+                <button onclick="nextProfile(false)" class="dislike-button">
+                    <img src="{% static 'img/explorer/x.png' %}" alt="J'aime pas">
+                </button>
+                <button onclick="nextProfile(true)" class="like-button">
+                    <img src="{% static 'img/explorer/heart.png' %}" alt="J'aime">
+                </button>
+            </div>
+        
+            <div class="profile-details" id="profile-details-1">
+                <h3>INFO PROFILE</h3>
+                <p>Nom:  frizzelle</p><br>
+                <p>Prénom:   frizzelle</p><br>
+                <p>Ville:   Paris</p><br>
+                <p>Passions:</p>
+                <p class="passion">
+                    . Danse<br>
+                    .Jeux<br>
+                    .cuisine
+
+                </p>
+            </div>
+            <div class="profile-details" id="profile-details-2">
+                <h3>INFO PROFILE</h3>
+                <p>Nom:   ursule</p><br>
+                <p>Prénom:  ursule</p><br>
+                <p>Ville:   london</p><br>
+                <p>Passions:</p>
+                <p class="passion">
+                    . Danse<br>
+                    .Jeux<br>
+                    .cuisine
+                    
+                </p>
+            </div>
+            <div class="profile-details" id="profile-details-3">
+                <h3>INFO PROFILE</h3>
+                <p>Nom:     khalifa</p><br>
+                <p>Prénom:     MIA</p><br>
+                <p>Ville:     washiton</p><br>
+                <p>Passions:</p>
+                <p class="passion">
+                    . Danse<br>
+                    .Jeux<br>
+                    .cuisine
+                    
+                </p>
+            </div>
+        </div>
+        <script src="{% static 'js/script.js' %}"></script>
+    </body>
+</html>

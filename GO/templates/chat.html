@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venus| Chat</title>
+    <link rel="stylesheet" href="{% static 'css/chat.css'%}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <main class="main-content">
+        <div class="container">
+            <div class="bloc1">
+                <div class="search">
+                    <input type="search" name="search-bar" id="search" placeholder="Search ...">
+                    <label for="search" class="ico">
+                        <i class='bx bx-search-alt'></i>
+                    </label>
+                </div>
+                <div class="contactss">
+                    <div class="contact1">
+                        <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        <div class="contact1-desc">
+                            <p class="contact1-name">Maryam Naz</p>
+                            <p class="contactlast">+99messages</p>
+                        </div>
+                    </div>
+                    <div class="contact1">
+                        <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        <div class="contact1-desc">
+                            <p class="contact1-name">Maryam Naz</p>
+                            <p class="contactlast">+99 messages</p>
+                        </div>
+                    </div>
+                    <div class="contact1">
+                        <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        <div class="contact1-desc">
+                            <p class="contact1-name">Maryam Naz</p>
+                            <p class="contactlast">+99 messages</p>
+                        </div>
+                    </div>
+                    <div class="contact1">
+                        <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        <div class="contact1-desc">
+                            <p class="contact1-name">Maryam Naz</p>
+                            <p class="contactlast">+99 messages</p>
+                        </div>
+                    </div>
+                    <div class="contact1">
+                        <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        <div class="contact1-desc">
+                            <p class="contact1-name">Maryam Naz</p>
+                            <p class="contactlast">+99 messages</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bloc2">
+                <div class="contact-header">
+                    <div class="contact">
+                        <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                    </div>
+                    <div class="contact-description">
+                        <p class="chat-with">{{recepient.nom}} {{recepient.prenom}}</p>
+                        <p class="message-number">2113 Messages</p>
+                    </div>
+                    <div class="call-option">
+                        <i class='bx bx-video'></i>
+                        <i class='bx bxs-phone'></i>
+                    </div>
+                    <div class="option">
+                        <i class='bx bx-info-circle'></i>
+                    </div>
+                </div>
+                <div class="messages-content">
+                    <div class="message-other">
+                        <div class="contact-img-other">
+                            <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        </div>
+                        <div class="contact-message-content">
+                            <p class="message2-1">Hey comment tu vas ?</p>
+                        </div>
+                    </div>
+                    <div class="message-me">
+                        <div class="contact-img-own">
+                            <img src="{% static 'img/chat/mess-hoe.jpeg' %}" alt="A girl contact">
+                        </div>
+                        <div class="contact-message-content">
+                            <p class="message1-1">Ca va et toi?</p>
+                        </div>
+                    </div>
+                    <div class="message-other">
+                        <div class="contact-img-other">
+                            <img src="{% static 'img/chat/mess-femme.jpeg' %}" alt="A girl contact">
+                        </div>
+                        <div class="contact-message-content">
+                            <p class="message2-1">Ça va bien</p>
+                        </div>
+                    </div>
+                    <div class="message-me">
+                        <div class="contact-img-own">
+                            <img src="{% static 'img/chat/mess-hoe.jpeg' %}" alt="A girl contact">
+                        </div>
+                        <div class="contact-message-content">
+                            <p class="message1-1">Ok super, Alors on dit quoi?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="enter-your-message">
+                    <div class="message-content">
+                        <i class='bx bx-link'></i>
+                        <textarea name="enter your message" id="message-enter" cols="30" rows="10" placeholder="Type your message..."></textarea>
+                        <button type="button"><i class='bx bxs-send'></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

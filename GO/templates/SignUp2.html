@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription | Venus</title>
+    <link rel="stylesheet" href="{% static 'css/SignUp2.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="logo-name"><h2>Venus</h2></div>
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form action="{% url 'signup2' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="inscription-content">
+            <div class="inscription-col1">
+                <div class="inp1">
+                    <h3 class="brand">{{ form.age.label_tag }}</h3>
+                    <input type="number" name="age" id="yo" min="18" max="60" placeholder="Age" required>
+                </div>
+                <div class="inp2">
+                    <h3 class="brand">{{ form.gender.label_tag }}</h3>
+                    {% for choice in form.gender.field.choices %}
+                        <input type="radio" id="{{ choice.0 }}" name="gender" value="{{ choice.0 }}">
+                        <label for="{{ choice.0 }}">{{ choice.1 }}</label><br>
+                    {% endfor %}
+                </div>
+                <div class="inp3">
+                    <h3>{{ form.photo_profil.label_tag }}</h3>
+                    <img src="{% static 'img/needed/noprofil.jpg' %}" alt="Insérez l'image" width="120" height="120">
+                    <!-- <div class="custom-import">
+                        <input type="file"  name="photo_profil" accept="image/*" id="Pp">
+                        <i class='bx bxs-camera'></i>
+                    </div> -->
+                </div>
+                
+            </div>
+            <div class="inscription-col2">
+                <div class="inp4">
+                    <h3 class="brand">{{ form.interests.label_tag }}</h3>
+                    <div class="ci">
+                        {{ form.intersts }}
+                        {% for choice in form.interests.field.choices %}
+                            <button type="button" value="{{ choice.0 }}" class="interest-button"><input type="checkbox" name="interests" value="{{ choice.0 }}">{{ choice.1 }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="inp5">
+                    <h3 class="brand">{{ form.description.label_tag }}</h3>
+                    {{ form.description }}
+                    <textarea ></textarea>
+                </div>
+                <button class="submit" type="submit">Envoyer</button>
+            </div>
+        </div>
+    </form>
+    <script src="{% static 'js/Inscriptionv2.js' %}"></script>
+</body>
+</html>

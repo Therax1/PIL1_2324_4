@@ -1,0 +1,228 @@
+*{
+    font-family: "Poppins", sans-serif;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(32deg,#d6e1e8 -.84%,rgba(214,225,232,0) 39%),linear-gradient(103.83deg,#c9d7f0 8.13%,#d4d2e9 33.38%,#dadaf4 50.11%,#e8d3dd 81.31%);
+}
+
+.container{
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+}
+/*Le bloc 1*/
+.bloc1 {
+    grid-column: 2 / 6;
+    border-radius: 30px;
+    box-shadow: 1px 1px 5px #64646479;
+    padding-top: 10Px;
+}
+/*Barre de recher*/
+.bloc1 .search input#search{
+    border-radius: 30px;
+    height: 50px;
+    outline: none;
+    border:none;
+    background-color: rgba(0, 0, 0, 0.158);
+    text-indent: 12px;
+    width: 90%;
+}
+.search {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+label.ico {
+    position: absolute;
+    right: 40px;
+    padding: 0;
+    margin: 0;
+    font-size: 26px;
+    color: #FFF;
+    font-weight: bold;
+    align-self: center;
+    cursor: pointer;
+}
+.bloc1 .search input#search::placeholder{
+    font-weight: 600;
+}
+
+/*COntacts*/
+
+.contact1 {
+    margin-top: 20px;
+    margin-left: 5px;
+    border-radius: 30px;
+    display: flex;
+    position: relative;
+}
+.contact1:hover{
+    cursor: pointer;
+    background-color: rgba(128, 128, 128, 0.253);
+}
+
+.contact1 img{
+    height: 80px;
+    width: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #FFF;
+}
+.contact1-desc{
+    padding: 0;
+}
+.contact1-desc p{
+    margin: 0;
+}
+.contact1-desc p.contact1-name{
+    text-transform: capitalize;
+    font-weight: 600;
+    font-size: 19px;
+}
+.contact1-desc p.contactlast{
+    position: absolute;
+    bottom: 0;
+    color: rgb(255, 255, 255);
+    font-style: italic;
+}
+
+
+
+.bloc2 {
+    grid-column: 7 / 12;
+    width: 500px;
+    position: relative;
+    padding: 10px;
+    box-shadow: 1px 1px 5px #64646479;
+    border-radius: 20px;
+}
+.contact-header {
+    border: 1px solid #ffffff44;
+    border-radius: 0px 0px 30px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.contact{
+    align-self: center;
+}
+.contact img{
+    height: 80px;
+    width: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #FFF;
+}
+.contact-description {
+    align-self: last baseline;
+    display: flex;
+    flex-direction: column;
+}
+.contact-description p{
+    margin: 10px 0;
+}
+.contact-description p.chat-with{
+    font-weight: bold;
+    text-transform: capitalize;
+    font-size: 19px;
+}
+.contact-description p.message-number{
+    font-style: italic;
+}
+
+.call-option {
+    font-size: 29px;
+    border: 1px dashed #FFF;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    
+}
+.call-option .bx{
+    margin: 5px 10px;
+    cursor: pointer;
+}
+.call-option .bx-video{
+    margin: 5px 10px;
+}
+.option {
+    cursor: pointer;
+    font-size: 32px;
+}
+
+.message-content {
+    display: flex;
+}
+.message-other {
+    display: flex;
+}
+.contact-img-other img{
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    object-fit: cover;
+}
+
+.contact-message-content {
+    display: flex;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 14px;
+    background-color: #ffffff44;
+}
+
+
+.message-me {
+    display: flex;
+    flex-direction: row-reverse;
+}
+.contact-img-own img{
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    object-fit: cover;
+}
+
+.enter-your-message textarea{
+    resize: none;
+    height: 50px;
+    width: 85%;
+    border-radius: 25px;
+    text-indent: 13px;
+    border: none;
+    outline: none;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+.enter-your-message textarea::placeholder{
+   margin: 15px;
+}
+
+.enter-your-message {
+    position: absolute;
+    padding: 0;
+    bottom: 0;
+}
+.message-content button{
+    background-color: transparent;
+    border: none;
+    font-size: 27px;
+}
+button.bxs-send{
+    margin: 0;
+    padding: 0;
+}
+
+.bx-link{
+    margin: 0;
+    padding: 0;
+    font-size: 29px;
+    align-self: center;
+}

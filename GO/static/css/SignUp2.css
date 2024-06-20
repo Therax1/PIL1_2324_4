@@ -1,0 +1,209 @@
+*{
+    font-family: "Poppins",sans-serif;
+}
+
+body{
+    background: linear-gradient(32deg,#d6e1e8 -.84%,rgba(214,225,232,0) 39%),linear-gradient(103.83deg,#c9d7f0 8.13%,#d4d2e9 33.38%,#dadaf4 50.11%,#e8d3dd 81.31%);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+/* Tout le formulaire */
+.inscription-content{
+    background: linear-gradient(32deg,#d6e1e8 -.84%,rgba(214,225,232,0) 39%),linear-gradient(103.83deg,#c9d7f0 8.13%,#d4d2e9 33.38%,#dadaf4 50.11%,#e8d3dd 81.31%);
+    display: flex;
+    box-shadow: -10px  5px 20px #00000047;
+    border-radius: 40px;
+    height: 530px;
+    width: 930px;
+}
+/* Tout les input du formulaire  */
+.inscription-content input{
+    text-indent: 6px;
+    outline: none;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 15px;
+}
+/*tout Les titres de niveaux 3 le formulaire */
+.inscription-col2  h3{
+    margin: 20px 20px 20px 0px; 
+}
+
+.inscription-col1  h3{
+    margin: 20px; 
+}
+
+/* Le texte de niveau 2 du body  */
+.logo-name h2{
+    margin: 0px 0px 10px 0px;
+    font-family: "Chewy", sans-serif;
+    font-size: 50px;
+    transition: 0.6s;
+}
+.logo-name h2:hover{
+    transform: scale(2) rotate(-5deg);
+    color: rgb(255, 58, 91);
+}
+
+/* Petite Animation du logo au :hover NULL mdr */
+/* @keyframes anim {
+    0%{
+        
+    }
+    25%{
+        transform: translate(530px);
+    }
+    50%{
+        transform: translate(530px, 630px);
+    }
+    75%{
+        transform: translate(-600px, 630px);
+    }
+    100%{
+        transform: translate(-600px, -200px);
+    }
+} */
+/* La premiere colone du formulaire  */
+.inscription-col1{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 30px;
+    border-radius: 30px 30px 30px 30px;
+}
+/* Pour la div age du formulaire */
+.inp1 #yo{
+    height: 45px;
+    width: 90px;
+}
+
+
+.inp2 input{
+    height: 18px;
+    width: 18px;
+}
+.inp2 label{
+    font-weight: 600;
+
+}
+
+/* Pour l'upload du profi */
+.inp3{
+    /* border: 1px solid; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 260px;
+    justify-content: center;
+}
+.inp3 h3 {
+    text-align: center;
+}
+.inp3 img{
+    border-radius: 50%;
+    border: 5px solid #fff;
+}
+.custom-import{
+    /* border: 1px solid green; */
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    position: relative;
+    bottom: 22px;
+    right: -37px;
+}
+.custom-import input[type = "file"]{
+    height: 30px;
+    width: 30px;
+    z-index: 2;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+.inp3 i{
+    position: absolute;
+    font-size: 30px;
+    right: 0;
+    color: rgb(70, 70, 70);
+}
+/* La deuxiÃ¨me colone du formulaire  */
+.inscription-col2{
+    flex: 1;
+    box-sizing: border-box;
+    padding: 30px;
+}
+
+/* Pour les centres d'intÃŠrÃĒts (Les boutons)*/
+
+.inp4 .ci{
+    padding: 0;
+    margin: 0;
+    border-radius: 30px;
+    padding: 10px;
+    box-shadow: -9px -6px 20px #00000047;
+}
+.inp4 .ci button{
+    height: 25px;
+    border:  none;
+    outline: none;
+    margin: 6px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.interest-button.selected {
+    background-color: #ff3ebc;
+    color: #fff;
+    font-weight: 600;
+    outline: none;
+}
+
+
+.inp5 textarea{
+    outline: none;
+    border: none;
+    resize: none;
+    border-radius: 20px;
+    text-indent: 12px;
+    font-weight: 500;
+}
+
+.inp5 textarea::placeholder{
+    font-weight: 500;
+}
+
+.inscription-col2 button.submit{
+    outline: none;
+    border: none;
+    height: 43px;
+    width: 80px;
+    border-radius: 30px;
+    transform: translate(280px);
+    cursor: pointer;
+    transition: 0.6s ease;
+    font-weight: 600;
+}
+.inscription-col2 button.submit:hover{
+    background-color: rgba(255, 153, 170, 0.769);
+}
+
+.messages {
+    background-color: rgb(0, 238, 255);
+    padding: 10px;
+    font-weight: bold ;
+    border-radius: 15 px ;
+}
+
+.alert-danger {
+    background-color: red;
+    padding: 10px;
+    font-weight: bold ;
+    border-radius: 15 px ;
+}

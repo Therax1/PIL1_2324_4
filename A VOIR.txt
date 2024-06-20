@@ -1,0 +1,2341 @@
+Voici l'adaptation de ta page HTML en format de template Django avec une gestion d'erreur maximale, y compris le hachage du mot de passe avant la vérification.
+
+### Modèle (Model)
+
+Supposons que tu utilises le même modèle `UserProfile` que précédemment.
+
+### Formulaire (Form)
+
+Crée un formulaire de connexion dans `forms.py`.
+
+```python
+from django import forms
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Username or E-mail'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+```
+
+### Vue (View)
+
+Crée une vue pour gérer le formulaire de connexion dans `views.py`.
+
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
+from .models import UserProfile
+from .forms import LoginForm
+
+def login_view(request):
+    error_message = None
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            try:
+                user = UserProfile.objects.get(email=email)
+                if check_password(password, user.password):
+                    # Connecte l'utilisateur
+                    # Par exemple, tu pourrais utiliser les sessions pour garder l'utilisateur connecté
+                    request.session['user_id'] = user.id
+                    return redirect('user_profile_list')
+                else:
+                    error_message = 'Mot de passe incorrect'
+            except UserProfile.DoesNotExist:
+                error_message = 'Utilisateur non trouvé'
+    else:
+        form = LoginForm()
+    
+    return render(request, 'login.html', {'form': form, 'error_message': error_message})
+```
+
+### Template (login.html)
+
+Adapte le HTML à un template Django avec gestion des erreurs.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Venus</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'css/SignIn.css' %}">
+</head>
+<body>
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <form class="container" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <h3>Venus</h3>
+                {% if error_message %}
+                    <p style="color: red;">{{ error_message }}</p>
+                {% endif %}
+                <input class="Username" type="text" name="email" placeholder="Username or E-mail" required value="{{ form.email.value|default:'' }}">
+                <br>
+                <input class="Password" type="password" name="password" placeholder="Password" required>
+                <br>
+                <button class="bouton" type="submit">Login</button>
+                <p class="texte">Pas encore inscrit? <a href="{% url 'signup' %}">Inscription</a></p>
+            </form>
+        </div>
+    </div>
+    <script src="{% static 'js/SignIn.js' %}"></script>
+</body>
+</html>
+```
+
+### Configuration des URLs
+
+Ajoute les URLs pour accéder à la vue de connexion dans `urls.py`.
+
+```python
+from django.urls import path
+from .views import login_view
+
+urlpatterns = [
+    path('login/', login_view, name='login'),
+    # Autres URLs
+]
+```
+
+### Gestion des fichiers statiques
+
+Assure-toi que tes fichiers CSS et JS sont correctement servis. Ajoute les paramètres de fichiers statiques dans `settings.py`.
+
+```python
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+
+# Si tu utilises collectstatic
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+```
+
+Crée ensuite les répertoires et fichiers suivants :
+
+- `static/css/SignIn.css`
+- `static/js/SignIn.js`
+
+Avec ces étapes, tu auras une page de connexion Django fonctionnelle avec une gestion d'erreur pour les mots de passe incorrects et un hachage des mots de passe.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Voici un exemple de code Django pour créer une base de données avec les champs spécifiés, y compris le hachage des mots de passe et le stockage des URLs des photos.
+
+### 1. Modèle Django
+
+Commence par définir le modèle dans un fichier `models.py` de ton application Django.
+
+```python
+from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.utils.translation import gettext_lazy as _
+
+class UserProfile(models.Model):
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    centres_d_interet = models.TextField(blank=True)
+    photo = models.URLField(blank=True)
+    presentation = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Only hash the password on creation
+            self.password = make_password(self.password)
+        super(UserProfile, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+```
+
+### 2. Formulaire Django
+
+Crée un formulaire pour gérer la création et la modification des utilisateurs dans `forms.py`.
+
+```python
+from django import forms
+from .models import UserProfile
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['nom', 'prenom', 'email', 'password', 'centres_d_interet', 'photo', 'presentation']
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        return make_password(password)
+```
+
+### 3. Vue Django
+
+Crée une vue pour gérer la création et la modification des utilisateurs dans `views.py`.
+
+```python
+from django.shortcuts import render, redirect
+from .forms import UserProfileForm
+
+def create_user_profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile_list')
+    else:
+        form = UserProfileForm()
+    return render(request, 'create_user_profile.html', {'form': form})
+
+def user_profile_list(request):
+    profiles = UserProfile.objects.all()
+    return render(request, 'user_profile_list.html', {'profiles': profiles})
+```
+
+### 4. Modèles de template
+
+Crée un modèle pour afficher le formulaire de création `create_user_profile.html`.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create User Profile</title>
+</head>
+<body>
+    <h2>Create User Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
+```
+
+Crée également un modèle pour afficher la liste des profils `user_profile_list.html`.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profiles</title>
+</head>
+<body>
+    <h2>User Profiles</h2>
+    <ul>
+        {% for profile in profiles %}
+            <li>{{ profile.nom }} {{ profile.prenom }} - <a href="{{ profile.photo }}">Photo</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+### 5. Configuration des URL
+
+Ajoute des URLs pour accéder aux vues dans `urls.py`.
+
+```python
+from django.urls import path
+from .views import create_user_profile, user_profile_list
+
+urlpatterns = [
+    path('create/', create_user_profile, name='create_user_profile'),
+    path('profiles/', user_profile_list, name='user_profile_list'),
+]
+```
+
+### 6. Configuration du stockage des photos
+
+Pour stocker les photos dans le projet Django, utilise le module `django-storages` avec un service de stockage comme Amazon S3 ou un stockage local. Voici un exemple de configuration pour un stockage local.
+
+#### Installation de `django-storages` et `boto3` (si tu utilises AWS S3)
+
+```bash
+pip install django-storages boto3
+```
+
+#### Configuration de `settings.py`
+
+Ajoute ces paramètres à ton fichier `settings.py`.
+
+```python
+# Configuration pour le stockage des fichiers
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Si tu utilises AWS S3
+# AWS_STORAGE_BUCKET_NAME = 'your-bucket-name'
+# AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+# MEDIA_URL = 'https://%s/' % AWS_S3_CUSTOM_DOMAIN
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+```
+
+#### Configuration des URL pour le développement
+
+Modifie `urls.py` pour servir les fichiers médias en développement.
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # Tes autres URLs
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+Avec ces étapes, tu auras un système complet pour gérer les utilisateurs avec les fonctionnalités de hachage de mot de passe et le stockage des URLs des photos. Pour un stockage de photos plus avancé, tu pourrais intégrer des services comme AWS S3.
+
+
+
+
+
+
+
+
+Pour remplir le tableau de bord (dashboard) d'un utilisateur après qu'il se soit connecté ou inscrit, tu peux utiliser les sessions pour stocker les informations de l'utilisateur. Voici les étapes détaillées pour y parvenir :
+
+### 1. Stocker les informations de l'utilisateur dans la session
+
+Lorsque l'utilisateur se connecte ou s'inscrit avec succès, stocke son ID ou une autre information unique dans la session. Voici comment tu peux le faire dans les vues de connexion et d'inscription.
+
+#### Vue de connexion (`views.py`)
+
+Modifie la vue de connexion pour stocker l'ID de l'utilisateur dans la session.
+
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
+from .models import UserProfile
+from .forms import LoginForm
+
+def login_view(request):
+    error_message = None
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            try:
+                user = UserProfile.objects.get(email=email)
+                if check_password(password, user.password):
+                    # Connecte l'utilisateur
+                    request.session['user_id'] = user.id
+                    return redirect('dashboard')  # Redirige vers le tableau de bord
+                else:
+                    error_message = 'Mot de passe incorrect'
+            except UserProfile.DoesNotExist:
+                error_message = 'Utilisateur non trouvé'
+    else:
+        form = LoginForm()
+    
+    return render(request, 'login.html', {'form': form, 'error_message': error_message})
+```
+
+#### Vue d'inscription (`views.py`)
+
+Ajoute une vue d'inscription si ce n'est pas déjà fait, et stocke également l'ID de l'utilisateur dans la session après l'inscription.
+
+```python
+from django.shortcuts import render, redirect
+from .forms import UserProfileForm
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Connecte l'utilisateur
+            request.session['user_id'] = user.id
+            return redirect('dashboard')  # Redirige vers le tableau de bord
+    else:
+        form = UserProfileForm()
+    return render(request, 'signup.html', {'form': form})
+```
+
+### 2. Créer une vue pour le tableau de bord (`views.py`)
+
+Crée une vue pour afficher le tableau de bord de l'utilisateur. Utilise l'ID de l'utilisateur stocké dans la session pour récupérer ses informations.
+
+```python
+from django.shortcuts import render, redirect
+from .models import UserProfile
+
+def dashboard_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # Redirige vers la page de connexion si l'utilisateur n'est pas connecté
+
+    try:
+        user = UserProfile.objects.get(id=user_id)
+    except UserProfile.DoesNotExist:
+        return redirect('login')  # Redirige vers la page de connexion si l'utilisateur n'existe pas
+
+    return render(request, 'dashboard.html', {'user': user})
+```
+
+### 3. Créer le template pour le tableau de bord (`dashboard.html`)
+
+Crée un template pour afficher les informations de l'utilisateur.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Venus</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <h1>Bienvenue, {{ user.prenom }} {{ user.nom }}</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Centres d'intérêt: {{ user.centres_d_interet }}</p>
+    <img src="{{ user.photo }}" alt="Photo de profil">
+    <p>Présentation: {{ user.presentation }}</p>
+</body>
+</html>
+```
+
+### 4. Configurer les URLs (`urls.py`)
+
+Ajoute les URLs pour accéder à la vue d'inscription et au tableau de bord.
+
+```python
+from django.urls import path
+from .views import login_view, signup_view, dashboard_view
+
+urlpatterns = [
+    path('login/', login_view, name='login'),
+    path('signup/', signup_view, name='signup'),
+    path('dashboard/', dashboard_view, name='dashboard'),
+    # Autres URLs
+]
+```
+
+### 5. (Optionnel) Protéger l'accès au tableau de bord
+
+Pour s'assurer que seules les personnes connectées peuvent accéder au tableau de bord, tu peux utiliser des décorateurs comme `login_required` de Django.
+
+#### Installation de `login_required`
+
+Si tu veux utiliser `login_required`, tu dois d'abord configurer l'authentification dans `settings.py` :
+
+```python
+LOGIN_URL = 'login'
+```
+
+#### Utilisation de `login_required`
+
+Ajoute le décorateur `login_required` à la vue du tableau de bord.
+
+```python
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def dashboard_view(request):
+    user_id = request.session.get('user_id')
+    try:
+        user = UserProfile.objects.get(id=user_id)
+    except UserProfile.DoesNotExist:
+        return redirect('login')  # Redirige vers la page de connexion si l'utilisateur n'existe pas
+
+    return render(request, 'dashboard.html', {'user': user})
+```
+
+Avec ces étapes, tu as maintenant un système où les utilisateurs peuvent se connecter ou s'inscrire, et leurs informations peuvent être utilisées pour remplir leur tableau de bord personnalisé.
+
+
+
+
+
+
+
+Pour afficher des photos choisies aléatoirement dans la base de données en fonction du genre de l'utilisateur connecté, et pour s'assurer que les photos soient renouvelées à chaque recharge de page, tu peux suivre les étapes suivantes :
+
+### 1. Ajouter un champ de genre au modèle `UserProfile`
+
+Assure-toi que le modèle `UserProfile` a un champ de genre.
+
+```python
+from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.utils.translation import gettext_lazy as _
+
+class UserProfile(models.Model):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+    ]
+    
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    centres_d_interet = models.TextField(blank=True)
+    photo = models.URLField(blank=True)
+    presentation = models.TextField(blank=True)
+    genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Only hash the password on creation
+            self.password = make_password(self.password)
+        super(UserProfile, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+```
+
+### 2. Vue pour la page d'accueil avec sélection aléatoire
+
+Modifie la vue de la page d'accueil pour sélectionner les photos de manière aléatoire et selon le genre de l'utilisateur connecté.
+
+```python
+from django.shortcuts import render, redirect
+from .models import UserProfile
+import random
+
+def home_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    try:
+        current_user = UserProfile.objects.get(id=user_id)
+    except UserProfile.DoesNotExist:
+        return redirect('login')
+    
+    # Sélectionner le genre opposé
+    target_genre = 'F' if current_user.genre == 'H' else 'H'
+
+    # Récupérer les utilisateurs du genre opposé
+    users = UserProfile.objects.filter(genre=target_genre)
+
+    # Mélanger les utilisateurs pour choisir aléatoirement
+    users = list(users)
+    random.shuffle(users)
+
+    return render(request, 'home.html', {'users': users})
+```
+
+### 3. Template pour la page d'accueil (`home.html`)
+
+Crée le template `home.html` pour afficher les utilisateurs de manière aléatoire.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil | Site de Rencontre</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="user-grid">
+        {% for user in users %}
+            <div class="user-card">
+                <img src="{{ user.photo }}" alt="Photo de {{ user.prenom }}" class="user-photo">
+                <div class="user-info">
+                    <h2>{{ user.prenom }} {{ user.nom }}</h2>
+                    <div class="icons">
+                        <a href="#" class="icon-link"><i class='bx bx-like'></i></a>
+                        <a href="#" class="icon-link"><i class='bx bx-message'></i></a>
+                        <a href="{% url 'user_profile' user.id %}" class="icon-link"><i class='bx bx-user'></i></a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+```
+
+### 4. Vue pour afficher le profil de l'utilisateur (`views.py`)
+
+Assure-toi d'avoir une vue pour afficher le profil de l'utilisateur.
+
+```python
+from django.shortcuts import render, get_object_or_404
+from .models import UserProfile
+
+def user_profile_view(request, user_id):
+    user = get_object_or_404(UserProfile, id=user_id)
+    return render(request, 'profile.html', {'user': user})
+```
+
+### 5. Template pour le profil de l'utilisateur (`profile.html`)
+
+Crée un template `profile.html` pour afficher les informations détaillées de l'utilisateur.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil de {{ user.prenom }}</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    <div class="profile-container">
+        <img src="{{ user.photo }}" alt="Photo de {{ user.prenom }}" class="profile-photo">
+        <h1>{{ user.prenom }} {{ user.nom }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <p>Centres d'intérêt: {{ user.centres_d_interet }}</p>
+        <p>Présentation: {{ user.presentation }}</p>
+    </div>
+</body>
+</html>
+```
+
+### 6. URL Configuration
+
+Ajoute les URLs pour la vue de la page d'accueil et pour afficher le profil d'un utilisateur spécifique.
+
+```python
+from django.urls import path
+from .views import home_view, user_profile_view
+
+urlpatterns = [
+    path('', home_view, name='home'),
+    path('profile/<int:user_id>/', user_profile_view, name='user_profile'),
+    # Autres URLs
+]
+```
+
+Avec ces étapes, tu as configuré un système où des photos d'utilisateurs sont affichées aléatoirement sur la page d'accueil en fonction du genre de l'utilisateur connecté, et où les liens de profil redirigent vers le profil de la personne dont la photo est affichée.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pour adapter la base de données SQL à un projet Django, nous devons créer les modèles Django correspondants et configurer les relations appropriées. Voici comment tu peux le faire.
+
+### 1. Modèles Django (`models.py`)
+
+Crée les modèles Django basés sur le schéma SQL décrit précédemment.
+
+```python
+from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
+class UserProfileManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, password, **extra_fields)
+
+class UserProfile(AbstractBaseUser):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+        ('A', 'Autre'),
+    ]
+
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    date_naissance = models.DateField()
+    date_inscription = models.DateTimeField(auto_now_add=True)
+    photo = models.URLField(blank=True)
+    presentation = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+
+class CentreInteret(models.Model):
+    nom = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nom
+
+class UserCentresInteret(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    centre_interet = models.ForeignKey(CentreInteret, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'centre_interet')
+
+class UserPreferences(models.Model):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+        ('A', 'Autre'),
+    ]
+    
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    genre_recherche = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    age_min = models.IntegerField()
+    age_max = models.IntegerField()
+
+class Message(models.Model):
+    sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='received_messages')
+    contenu = models.TextField()
+    date_envoi = models.DateTimeField(auto_now_add=True)
+
+class Like(models.Model):
+    liker = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='given_likes')
+    liked = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='received_likes')
+    date_like = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('liker', 'liked')
+
+class ProfileVisit(models.Model):
+    visitor = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profile_visits_made')
+    visited = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profile_visits_received')
+    date_visit = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('visitor', 'visited')
+```
+
+### 2. Admin Configuration (`admin.py`)
+
+Pour gérer les modèles via l'interface d'administration Django, ajoute-les à `admin.py`.
+
+```python
+from django.contrib import admin
+from .models import UserProfile, CentreInteret, UserCentresInteret, UserPreferences, Message, Like, ProfileVisit
+
+admin.site.register(UserProfile)
+admin.site.register(CentreInteret)
+admin.site.register(UserCentresInteret)
+admin.site.register(UserPreferences)
+admin.site.register(Message)
+admin.site.register(Like)
+admin.site.register(ProfileVisit)
+```
+
+### 3. Formulaires Django (`forms.py`)
+
+Crée des formulaires pour la connexion, l'inscription, et les préférences de recherche.
+
+```python
+from django import forms
+from .models import UserProfile, UserPreferences
+
+class UserProfileForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = UserProfile
+        fields = ['email', 'password', 'nom', 'prenom', 'genre', 'date_naissance', 'photo', 'presentation']
+
+class LoginForm(forms.Form):
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+
+class UserPreferencesForm(forms.ModelForm):
+    class Meta:
+        model = UserPreferences
+        fields = ['genre_recherche', 'age_min', 'age_max']
+```
+
+### 4. Vues Django (`views.py`)
+
+Met à jour les vues pour gérer la logique de connexion, inscription, et préférences.
+
+```python
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from .models import UserProfile, CentreInteret, UserPreferences, Message, Like, ProfileVisit
+from .forms import UserProfileForm, LoginForm, UserPreferencesForm
+import random
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserProfileForm()
+    return render(request, 'signup.html', {'form': form})
+
+def login_view(request):
+    error_message = None
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                error_message = 'Email ou mot de passe incorrect'
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form, 'error_message': error_message})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
+def home_view(request):
+    current_user = request.user
+    target_genre = 'F' if current_user.genre == 'H' else 'H'
+    users = UserProfile.objects.filter(genre=target_genre)
+    users = list(users)
+    random.shuffle(users)
+    return render(request, 'home.html', {'users': users})
+
+@login_required
+def user_profile_view(request, user_id):
+    user = get_object_or_404(UserProfile, id=user_id)
+    return render(request, 'profile.html', {'user': user})
+
+@login_required
+def preferences_view(request):
+    if request.method == 'POST':
+        form = UserPreferencesForm(request.POST, instance=request.user.userpreferences)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = UserPreferencesForm(instance=request.user.userpreferences)
+    return render(request, 'preferences.html', {'form': form})
+```
+
+### 5. Templates Django
+
+Crée les templates nécessaires pour les pages de connexion, inscription, accueil, profil, et préférences.
+
+#### `signup.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription | Site de Rencontre</title>
+</head>
+<body>
+    <h2>Inscription</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">S'inscrire</button>
+    </form>
+</body>
+</html>
+```
+
+#### `login.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | Site de Rencontre</title>
+</head>
+<body>
+    <h2>Connexion</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Se connecter</button>
+        {% if error_message %}
+            <p>{{ error_message }}</p>
+        {% endif %}
+    </form>
+</body>
+</html>
+```
+
+#### `home.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil | Site de Rencontre</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <
+
+div class="user-grid">
+        {% for user in users %}
+            <div class="user-card">
+                <img src="{{ user.photo }}" alt="Photo de {{ user.prenom }}" class="user-photo">
+                <div class="user-info">
+                    <h2>{{ user.prenom }} {{ user.nom }}</h2>
+                    <div class="icons">
+                        <a href="#" class="icon-link"><i class='bx bx-like'></i></a>
+                        <a href="#" class="icon-link"><i class='bx bx-message'></i></a>
+                        <a href="{% url 'user_profile' user.id %}" class="icon-link"><i class='bx bx-user'></i></a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+```
+
+#### `profile.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil de {{ user.prenom }}</title>
+</head>
+<body>
+    <div class="profile-container">
+        <img src="{{ user.photo }}" alt="Photo de {{ user.prenom }}" class="profile-photo">
+        <h1>{{ user.prenom }} {{ user.nom }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <p>Centres d'intérêt: 
+            {% for centre in user.centres_d_interet.all %}
+                {{ centre.nom }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p>Présentation: {{ user.presentation }}</p>
+    </div>
+</body>
+</html>
+```
+
+#### `preferences.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Préférences | Site de Rencontre</title>
+</head>
+<body>
+    <h2>Préférences de recherche</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Enregistrer</button>
+    </form>
+</body>
+</html>
+```
+
+### 6. URL Configuration
+
+Mets à jour le fichier `urls.py` pour inclure les vues nécessaires.
+
+```python
+from django.urls import path
+from .views import signup_view, login_view, logout_view, home_view, user_profile_view, preferences_view
+
+urlpatterns = [
+    path('signup/', signup_view, name='signup'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
+    path('', home_view, name='home'),
+    path('profile/<int:user_id>/', user_profile_view, name='user_profile'),
+    path('preferences/', preferences_view, name='preferences'),
+]
+```
+
+En suivant ces étapes, tu pourras créer une application Django complète et efficace pour un site de rencontres avancé, avec une gestion sécurisée des utilisateurs, des profils et des interactions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Créer une base de données complète et efficace pour un site de rencontres avancé nécessite de prendre en compte divers aspects fonctionnels comme les utilisateurs, leurs profils, leurs préférences, les messages, les interactions (likes, visites de profil, etc.), et bien plus. Voici une proposition de schéma SQL pour une telle base de données.
+
+### Création de la base de données et des tables
+
+```sql
+-- Création de la base de données
+CREATE DATABASE site_de_rencontre;
+USE site_de_rencontre;
+
+-- Table pour les utilisateurs
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    nom VARCHAR(100),
+    prenom VARCHAR(100),
+    genre ENUM('H', 'F', 'Autre'),
+    date_naissance DATE,
+    date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    photo VARCHAR(255),
+    presentation TEXT
+);
+
+-- Table pour les centres d'intérêt
+CREATE TABLE centres_interet (
+    centre_id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
+-- Table pour les utilisateurs et leurs centres d'intérêt
+CREATE TABLE user_centres_interet (
+    user_id INT,
+    centre_id INT,
+    PRIMARY KEY (user_id, centre_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (centre_id) REFERENCES centres_interet(centre_id) ON DELETE CASCADE
+);
+
+-- Table pour les préférences de recherche
+CREATE TABLE user_preferences (
+    user_id INT PRIMARY KEY,
+    genre_recherche ENUM('H', 'F', 'Autre'),
+    age_min INT,
+    age_max INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- Table pour les messages
+CREATE TABLE messages (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT,
+    receiver_id INT,
+    contenu TEXT NOT NULL,
+    date_envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- Table pour les likes
+CREATE TABLE likes (
+    liker_id INT,
+    liked_id INT,
+    date_like TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (liker_id, liked_id),
+    FOREIGN KEY (liker_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (liked_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- Table pour les visites de profil
+CREATE TABLE profile_visits (
+    visitor_id INT,
+    visited_id INT,
+    date_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (visitor_id, visited_id),
+    FOREIGN KEY (visitor_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (visited_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+```
+
+### Explications
+
+1. **Table `users`** : Contient les informations principales des utilisateurs, y compris le nom, le prénom, le genre, la date de naissance, la date d'inscription, la photo, et une présentation.
+
+2. **Table `centres_interet`** : Liste des centres d'intérêt disponibles sur le site.
+
+3. **Table `user_centres_interet`** : Association entre les utilisateurs et leurs centres d'intérêt.
+
+4. **Table `user_preferences`** : Préférences de recherche des utilisateurs, incluant le genre recherché et la tranche d'âge préférée.
+
+5. **Table `messages`** : Contient les messages échangés entre utilisateurs, avec une référence à l'expéditeur et au destinataire.
+
+6. **Table `likes`** : Stocke les likes entre utilisateurs. Un like est enregistré avec l'ID de l'utilisateur qui aime et l'ID de l'utilisateur aimé.
+
+7. **Table `profile_visits`** : Enregistre les visites de profil, avec l'ID du visiteur et l'ID du profil visité.
+
+### Indexation et performance
+
+Pour optimiser les performances, surtout avec une grande base de données, il est important d'ajouter des index sur les colonnes fréquemment utilisées dans les requêtes.
+
+```sql
+-- Ajout d'index pour les colonnes fréquemment requêtées
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_user_centres_interet_user_id ON user_centres_interet(user_id);
+CREATE INDEX idx_user_centres_interet_centre_id ON user_centres_interet(centre_id);
+CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_messages_receiver_id ON messages(receiver_id);
+CREATE INDEX idx_likes_liker_id ON likes(liker_id);
+CREATE INDEX idx_likes_liked_id ON likes(liked_id);
+CREATE INDEX idx_profile_visits_visitor_id ON profile_visits(visitor_id);
+CREATE INDEX idx_profile_visits_visited_id ON profile_visits(visited_id);
+```
+
+### Sécurité
+
+Pour assurer la sécurité des données des utilisateurs, assure-toi de :
+
+1. **Hacher les mots de passe** : Utilise une fonction de hachage comme bcrypt pour stocker les mots de passe de manière sécurisée.
+2. **Utiliser les liaisons de paramètres** : Lors de la construction des requêtes SQL dans l'application pour prévenir les injections SQL.
+3. **Gérer les accès et les permissions** : Assure-toi que seules les personnes autorisées peuvent accéder ou modifier certaines données.
+
+En suivant ce schéma et en appliquant les bonnes pratiques de développement sécurisé, tu devrais être en mesure de créer une base de données robuste et évolutive pour un site de rencontres avancé.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bien sûr ! Expliquons chaque partie du code de manière détaillée pour qu'un enfant de 14 ans puisse comprendre et éventuellement reproduire chaque étape.
+
+### 1. Modèles Django (`models.py`)
+
+#### Explication de chaque ligne :
+
+```python
+from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+```
+
+- **Importations de modules** : Ces lignes permettent d'importer des fonctionnalités nécessaires à la création des modèles Django. `models` est utilisé pour définir les modèles de base de données, `make_password` est une fonction pour hacher les mots de passe, et `AbstractBaseUser` et `BaseUserManager` sont utilisés pour créer un modèle personnalisé d'utilisateur.
+
+```python
+class UserProfileManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, password, **extra_fields)
+```
+
+- **Gestionnaire de profil utilisateur** : Cette partie définit une classe `UserProfileManager` qui hérite de `BaseUserManager`. Elle contient deux méthodes :
+  - `create_user` : Crée un nouvel utilisateur avec un email et un mot de passe. Si aucun email n'est fourni, une erreur est levée. L'email est normalisé (mis en minuscules) pour assurer la cohérence. Le mot de passe est haché avant d'être enregistré.
+  - `create_superuser` : Crée un superutilisateur avec des privilèges spéciaux. Il utilise la méthode `create_user` mais définit également l'utilisateur comme membre du personnel (`is_staff=True`) et superutilisateur (`is_superuser=True`).
+
+```python
+class UserProfile(AbstractBaseUser):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+        ('A', 'Autre'),
+    ]
+
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    date_naissance = models.DateField()
+    date_inscription = models.DateTimeField(auto_now_add=True)
+    photo = models.URLField(blank=True)
+    presentation = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+```
+
+- **Modèle `UserProfile`** : Cette partie définit le modèle de données pour un utilisateur du site de rencontre.
+  - `GENRE_CHOICES` : Définit les choix possibles pour le genre, comme "Homme", "Femme", ou "Autre".
+  - Chaque champ (par exemple `email`, `password`, `nom`, `prenom`, etc.) représente une colonne dans la base de données. Par exemple, `models.EmailField(unique=True)` signifie que l'email doit être unique pour chaque utilisateur.
+  - `objects = UserProfileManager()` : Utilise le gestionnaire de profil défini précédemment.
+  - `USERNAME_FIELD = 'email'` : Utilise l'email comme champ d'identification unique pour l'utilisateur.
+  - `REQUIRED_FIELDS = []` : Indique qu'aucun autre champ n'est requis pour la création d'un utilisateur.
+
+```python
+class CentreInteret(models.Model):
+    nom = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nom
+```
+
+- **Modèle `CentreInteret`** : Définit un modèle pour les centres d'intérêt des utilisateurs.
+  - `nom = models.CharField(max_length=100)` : Définit un champ pour le nom du centre d'intérêt.
+  - `def __str__(self)` : Méthode spéciale qui retourne une représentation sous forme de chaîne du centre d'intérêt, ici le nom.
+
+```python
+class UserCentresInteret(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    centre_interet = models.ForeignKey(CentreInteret, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'centre_interet')
+```
+
+- **Modèle `UserCentresInteret`** : Associe les utilisateurs à leurs centres d'intérêt.
+  - `user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)` : Clé étrangère qui relie cet enregistrement à un utilisateur spécifique dans la table `UserProfile`.
+  - `centre_interet = models.ForeignKey(CentreInteret, on_delete=models.CASCADE)` : Clé étrangère qui relie cet enregistrement à un centre d'intérêt spécifique dans la table `CentreInteret`.
+  - `class Meta` : Contient des métadonnées supplémentaires pour ce modèle, ici `unique_together` assure que chaque association `user` - `centre_interet` est unique.
+
+```python
+class UserPreferences(models.Model):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+        ('A', 'Autre'),
+    ]
+    
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    genre_recherche = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    age_min = models.IntegerField()
+    age_max = models.IntegerField()
+```
+
+- **Modèle `UserPreferences`** : Stocke les préférences de recherche d'un utilisateur.
+  - `user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)` : Utilise une relation un-à-un avec `UserProfile`, indiquant que chaque utilisateur a un seul ensemble de préférences.
+  - `genre_recherche = models.CharField(max_length=1, choices=GENRE_CHOICES)` : Champ pour le genre recherché par l'utilisateur.
+  - `age_min` et `age_max` : Champs pour l'âge minimum et maximum des utilisateurs recherchés.
+
+```python
+class Message(models.Model):
+    sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='received_messages')
+    contenu = models.TextField()
+    date_envoi = models.DateTimeField(auto_now_add=True)
+```
+
+- **Modèle `Message`** : Représente un message envoyé entre utilisateurs.
+  - `sender` et `receiver` : Clés étrangères vers `UserProfile` indiquant l'expéditeur et le destinataire.
+  - `contenu = models.TextField()` : Champ pour le contenu du message.
+  - `date_envoi = models.DateTimeField(auto_now_add=True)` : Champ pour enregistrer la date et l'heure d'envoi automatiquement.
+
+```python
+class Like(models.Model):
+    liker = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='given_likes')
+    liked = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='received_likes')
+    date_like = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('liker', 'liked')
+```
+
+- **Modèle `Like`** : Représente un "like" donné par un utilisateur à un autre utilisateur.
+  - `liker` et `liked` : Clés étrangères vers `UserProfile` indiquant celui qui donne le like (`liker`) et celui qui le reçoit (`liked`).
+  - `date_like = models.DateTimeField(auto_now_add=True)` : Champ pour enregistrer la date et l'heure du like automatiquement.
+  - `class Meta` : Définit des métadonnées, ici `unique_together`, qui assure que chaque paire (`liker`, `liked`) est unique pour empêcher les doublons de likes.
+
+```python
+class ProfileVisit(models.Model):
+    visitor = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profile_visits_made')
+    visited = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profile_visits_received')
+    date_visit = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('visitor', 'visited')
+```
+
+- **Modèle `ProfileVisit`** : Enregistre les visites de profil entre utilisateurs.
+  - `visitor` et `visited` : Clés étrangères vers `UserProfile` indiquant celui qui visite (`visitor`) et celui dont le profil est visité (`visited`).
+  - `date_visit = models.DateTimeField(auto_now_add=True)` : Champ pour enregistrer la date et l'heure de la visite automatiquement.
+  - `class Meta` : Définit des métadonnées, ici `unique_together`, pour assurer l'unicité des paires (`visitor`, `visited`).
+
+### 2. Admin Configuration (`admin.py`)
+
+#### Explication
+
+
+
+
+
+
+
+
+Pour permettre à un utilisateur de voir qui a aimé sa photo et qui a visité son profil dans un site de rencontre Django, nous devons créer des vues, des modèles et des templates appropriés. Voici comment procéder :
+
+### 1. Modèles Django (`models.py`)
+
+Tout d'abord, mettons à jour les modèles existants pour inclure les fonctionnalités de likes et de visites de profil.
+
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.utils import timezone
+
+class UserProfileManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, password, **extra_fields)
+
+class UserProfile(AbstractBaseUser):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+        ('A', 'Autre'),
+    ]
+
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    date_naissance = models.DateField()
+    date_inscription = models.DateTimeField(auto_now_add=True)
+    photo = models.URLField(blank=True)
+    presentation = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+
+class Like(models.Model):
+    liker = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='given_likes')
+    liked = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='received_likes')
+    date_like = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('liker', 'liked')
+
+class ProfileVisit(models.Model):
+    visitor = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profile_visits_made')
+    visited = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profile_visits_received')
+    date_visit = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('visitor', 'visited')
+```
+
+### 2. Vues Django (`views.py`)
+
+Créons maintenant des vues pour afficher qui a aimé la photo de l'utilisateur et qui a visité son profil.
+
+```python
+from django.shortcuts import render
+from .models import Like, ProfileVisit
+
+def likes_view(request):
+    user = request.user
+    likes_received = Like.objects.filter(liked=user)
+    return render(request, 'likes.html', {'likes_received': likes_received})
+
+def profile_visits_view(request):
+    user = request.user
+    visits_received = ProfileVisit.objects.filter(visited=user)
+    return render(request, 'profile_visits.html', {'visits_received': visits_received})
+```
+
+### 3. Templates Django
+
+Créons les templates pour afficher les informations sur les likes reçus et les visites de profil reçues.
+
+#### `likes.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Likes reçus</title>
+</head>
+<body>
+    <h2>Likes reçus</h2>
+    <ul>
+        {% for like in likes_received %}
+            <li>{{ like.liker }} a aimé votre photo le {{ like.date_like }}</li>
+        {% empty %}
+            <li>Aucun like reçu pour le moment.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+#### `profile_visits.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visites de profil reçues</title>
+</head>
+<body>
+    <h2>Visites de profil reçues</h2>
+    <ul>
+        {% for visit in visits_received %}
+            <li>{{ visit.visitor }} a visité votre profil le {{ visit.date_visit }}</li>
+        {% empty %}
+            <li>Aucune visite de profil reçue pour le moment.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+### 4. URL Configuration (`urls.py`)
+
+Ajoutons les URLs pour ces vues dans le fichier `urls.py` de notre application Django.
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('likes/', views.likes_view, name='likes'),
+    path('profile_visits/', views.profile_visits_view, name='profile_visits'),
+]
+```
+
+### 5. Liens dans le Template
+
+Pour que l'utilisateur puisse accéder à ces pages depuis son tableau de bord ou autre, nous devons ajouter des liens dans le template approprié.
+
+```html
+<!-- Par exemple, dans le template du tableau de bord de l'utilisateur -->
+<a href="{% url 'likes' %}">Voir les likes reçus</a>
+<a href="{% url 'profile_visits' %}">Voir les visites de profil reçues</a>
+```
+
+### Explication générale :
+
+- **Modèles** : Nous avons ajouté deux nouveaux modèles (`Like` et `ProfileVisit`) pour enregistrer les likes et les visites de profil entre utilisateurs.
+- **Vues** : Nous avons créé deux vues (`likes_view` et `profile_visits_view`) qui récupèrent les données nécessaires depuis la base de données et les passent aux templates.
+- **Templates** : Nous avons créé des templates (`likes.html` et `profile_visits.html`) qui affichent les informations sur les likes reçus et les visites de profil reçues.
+- **URLs** : Nous avons configuré les URLs pour ces vues afin que l'utilisateur puisse y accéder depuis le navigateur en cliquant sur les liens correspondants.
+
+Avec ces étapes, l'utilisateur pourra voir qui a aimé sa photo et qui a visité son profil sur le site de rencontre Django.
+
+
+
+
+Pour permettre à un utilisateur de voir qui est en ligne sur un site de rencontre Django, nous devons suivre plusieurs étapes. Voici comment procéder :
+
+### 1. Ajouter un champ pour le statut en ligne dans le modèle UserProfile
+
+Nous allons ajouter un champ `en_ligne` dans notre modèle `UserProfile` pour indiquer si un utilisateur est actuellement connecté.
+
+#### Modèle `UserProfile` dans `models.py` :
+
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.utils import timezone
+
+class UserProfileManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(email, password, **extra_fields)
+
+class UserProfile(AbstractBaseUser):
+    GENRE_CHOICES = [
+        ('H', 'Homme'),
+        ('F', 'Femme'),
+        ('A', 'Autre'),
+    ]
+
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    date_naissance = models.DateField()
+    date_inscription = models.DateTimeField(auto_now_add=True)
+    photo = models.URLField(blank=True)
+    presentation = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    en_ligne = models.BooleanField(default=False)  # Nouveau champ pour indiquer si l'utilisateur est en ligne
+
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+```
+
+### 2. Ajouter une méthode pour mettre à jour le statut en ligne
+
+Nous allons créer une méthode dans `UserProfile` pour mettre à jour le statut en ligne lorsqu'un utilisateur se connecte ou se déconnecte.
+
+#### Méthode dans `UserProfile` :
+
+```python
+    def set_online(self):
+        self.en_ligne = True
+        self.save(update_fields=['en_ligne'])
+
+    def set_offline(self):
+        self.en_ligne = False
+        self.save(update_fields=['en_ligne'])
+```
+
+### 3. Mettre à jour les vues et templates appropriés
+
+Nous devons mettre à jour nos vues et templates pour afficher qui est en ligne.
+
+#### Vue pour afficher les utilisateurs en ligne dans `views.py` :
+
+```python
+from django.shortcuts import render
+from .models import UserProfile
+
+def online_users_view(request):
+    online_users = UserProfile.objects.filter(en_ligne=True)
+    return render(request, 'online_users.html', {'online_users': online_users})
+```
+
+#### Template `online_users.html` :
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilisateurs en ligne</title>
+</head>
+<body>
+    <h2>Utilisateurs en ligne</h2>
+    <ul>
+        {% for user in online_users %}
+            <li>{{ user.nom }} {{ user.prenom }}</li>
+        {% empty %}
+            <li>Aucun utilisateur en ligne pour le moment.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+### 4. Ajouter une vue et une URL pour afficher les utilisateurs en ligne
+
+Dans `urls.py`, nous ajoutons une nouvelle URL pour la vue `online_users_view`.
+
+#### Configuration des URLs dans `urls.py` :
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Autres URLs existantes...
+    path('online_users/', views.online_users_view, name='online_users'),
+]
+```
+
+### 5. Liens dans le template principal pour accéder aux utilisateurs en ligne
+
+Ajoutons un lien dans le template principal pour que l'utilisateur puisse accéder à la liste des utilisateurs en ligne.
+
+#### Exemple dans le template principal :
+
+```html
+<!-- Par exemple, dans le template du tableau de bord de l'utilisateur -->
+<a href="{% url 'online_users' %}">Voir les utilisateurs en ligne</a>
+```
+
+### Explication générale :
+
+- **Modèle `UserProfile`** : Nous avons ajouté un champ `en_ligne` pour indiquer si un utilisateur est en ligne.
+- **Méthodes `set_online` et `set_offline`** : Ces méthodes permettent de mettre à jour le champ `en_ligne` lorsque l'utilisateur se connecte ou se déconnecte.
+- **Vue `online_users_view`** : Cette vue récupère tous les utilisateurs dont le champ `en_ligne` est à `True` et les passe au template `online_users.html`.
+- **Template `online_users.html`** : Ce template affiche la liste des utilisateurs en ligne.
+- **URLs et liens** : Nous avons configuré une nouvelle URL pour la vue `online_users_view` et ajouté un lien dans le template principal pour permettre à l'utilisateur d'accéder à la liste des utilisateurs en ligne.
+
+En suivant ces étapes, l'utilisateur pourra voir qui est actuellement en ligne sur le site de rencontre Django.
+
+
+
+
+Pour permettre à un utilisateur de se déconnecter d'un site web Django, nous devons mettre en place une fonctionnalité de déconnexion. Voici comment procéder :
+
+### 1. Vue Django pour la déconnexion
+
+Nous allons créer une vue qui gère la déconnexion de l'utilisateur. Cette vue va effacer la session active de l'utilisateur, le déconnectant ainsi du site.
+
+#### Dans `views.py` :
+
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')  # Redirige vers la page d'accueil ou une autre page après la déconnexion
+```
+
+### 2. Configuration des URLs
+
+Nous devons configurer une URL pour la vue de déconnexion afin que l'utilisateur puisse y accéder.
+
+#### Dans `urls.py` :
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Autres URLs existantes...
+    path('logout/', views.logout_view, name='logout'),
+]
+```
+
+### 3. Template pour le lien de déconnexion
+
+Ajoutons un lien dans le template principal (ou n'importe quel autre template) pour permettre à l'utilisateur de se déconnecter en cliquant dessus.
+
+#### Exemple dans le template principal (`base.html` par exemple) :
+
+```html
+<!-- Par exemple, dans le template du tableau de bord de l'utilisateur -->
+<a href="{% url 'logout' %}">Déconnexion</a>
+```
+
+### Explication :
+
+- **Vue `logout_view`** : Cette vue utilise la fonction `logout` fournie par Django pour déconnecter l'utilisateur en effaçant sa session. Ensuite, elle redirige l'utilisateur vers une page spécifiée, ici `'home'`, qui est généralement la page d'accueil après la déconnexion.
+  
+- **URLs** : Nous avons configuré une URL (`/logout/`) pour la vue `logout_view` dans `urls.py`, de sorte que lorsque l'utilisateur visite cette URL, la fonction `logout_view` est appelée.
+
+- **Template** : Nous avons ajouté un lien dans le template (`base.html` ou autre) qui pointe vers l'URL `'logout'`. Cela permet à l'utilisateur de se déconnecter en cliquant sur ce lien.
+
+En suivant ces étapes, vous pouvez implémenter facilement la fonctionnalité de déconnexion pour votre site web Django, permettant ainsi aux utilisateurs de se déconnecter proprement et en toute sécurité.
+
+
+
+
+Pour créer une fonctionnalité de notifications sur votre site de rencontre Django, similaire à celle de Facebook, où l'utilisateur reçoit des notifications lorsqu'il reçoit un like sur sa photo ou lorsqu'un autre utilisateur visite son profil, nous allons suivre plusieurs étapes :
+
+### 1. Modèles Django pour les Notifications
+
+Tout d'abord, nous allons créer un modèle pour gérer les notifications.
+
+#### Modèle `Notification` dans `models.py` :
+
+```python
+from django.db import models
+from django.utils import timezone
+from .models import UserProfile
+
+class Notification(models.Model):
+    TYPE_LIKE = 'like'
+    TYPE_VISIT = 'visit'
+
+    NOTIFICATION_TYPES = [
+        (TYPE_LIKE, 'Like'),
+        (TYPE_VISIT, 'Visit'),
+    ]
+
+    user_to_notify = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='notifications_received')
+    type = models.CharField(max_length=10, choices=NOTIFICATION_TYPES)
+    from_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='notifications_sent')
+    timestamp = models.DateTimeField(default=timezone.now)
+    read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.get_type_display()} from {self.from_user.nom} {self.from_user.prenom}'
+```
+
+### 2. Création des Notifications
+
+Maintenant, nous devons mettre à jour nos vues pour créer des notifications chaque fois qu'un utilisateur like une photo ou visite un profil.
+
+#### Exemple de création de notification dans une vue (à intégrer dans vos vues existantes) :
+
+```python
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import UserProfile, Like, ProfileVisit, Notification
+
+def like_photo(request, user_id):
+    liked_user = get_object_or_404(UserProfile, pk=user_id)
+    like = Like.objects.create(liker=request.user, liked=liked_user)
+
+    # Créer une notification
+    Notification.objects.create(user_to_notify=liked_user, type=Notification.TYPE_LIKE, from_user=request.user)
+
+    # Rediriger ou renvoyer une réponse JSON selon votre besoin
+    return redirect('photo_detail', user_id=user_id)  # Redirection vers une page détaillée de la photo
+
+def visit_profile(request, user_id):
+    visited_user = get_object_or_404(UserProfile, pk=user_id)
+    ProfileVisit.objects.create(visitor=request.user, visited=visited_user)
+
+    # Créer une notification
+    Notification.objects.create(user_to_notify=visited_user, type=Notification.TYPE_VISIT, from_user=request.user)
+
+    # Rediriger ou renvoyer une réponse JSON selon votre besoin
+    return redirect('profile_detail', user_id=user_id)  # Redirection vers une page détaillée du profil
+```
+
+### 3. Affichage des Notifications
+
+Maintenant, nous allons créer une vue pour afficher les notifications non lues de l'utilisateur.
+
+#### Vue pour afficher les notifications dans `views.py` :
+
+```python
+def notifications_view(request):
+    user = request.user
+    notifications = Notification.objects.filter(user_to_notify=user, read=False).order_by('-timestamp')
+
+    # Marquer les notifications comme lues
+    notifications.update(read=True)
+
+    return render(request, 'notifications.html', {'notifications': notifications})
+```
+
+### 4. Template pour afficher les Notifications
+
+Créez un template pour afficher les notifications à l'utilisateur.
+
+#### Template `notifications.html` :
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+</head>
+<body>
+    <h2>Notifications</h2>
+    <ul>
+        {% for notification in notifications %}
+            <li>
+                {% if notification.type == 'like' %}
+                    <a href="{% url 'profile_detail' notification.from_user.id %}">
+                        {{ notification.from_user.nom }} {{ notification.from_user.prenom }} vous a aimé(e)
+                    </a>
+                {% elif notification.type == 'visit' %}
+                    <a href="{% url 'profile_detail' notification.from_user.id %}">
+                        {{ notification.from_user.nom }} {{ notification.from_user.prenom }} a visité votre profil
+                    </a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>Aucune nouvelle notification.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+### 5. Configuration des URLs
+
+Ajoutez une URL pour la vue `notifications_view`.
+
+#### Configuration des URLs dans `urls.py` :
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Autres URLs existantes...
+    path('notifications/', views.notifications_view, name='notifications'),
+]
+```
+
+### 6. Liens dans le Template Principal
+
+Ajoutez un lien dans le template principal pour permettre à l'utilisateur d'accéder à ses notifications.
+
+#### Exemple dans le template principal (`base.html` par exemple) :
+
+```html
+<!-- Par exemple, dans le menu de navigation -->
+<a href="{% url 'notifications' %}">Notifications</a>
+```
+
+### Explication générale :
+
+- **Modèle `Notification`** : Nous avons créé un modèle `Notification` pour enregistrer les notifications avec des champs comme `user_to_notify` (utilisateur à notifier), `type` (type de notification), `from_user` (utilisateur à l'origine de la notification), etc.
+  
+- **Vues** : Nous avons ajouté des vues (`like_photo`, `visit_profile`, `notifications_view`) pour gérer la création des notifications et l'affichage des notifications non lues.
+
+- **Templates** : Nous avons créé un template (`notifications.html`) pour afficher les notifications à l'utilisateur, en incluant des liens vers les profils des utilisateurs qui ont aimé sa photo ou visité son profil.
+
+- **URLs et liens** : Nous avons configuré une URL pour la vue `notifications_view` et ajouté un lien dans le template principal (`base.html`) pour permettre à l'utilisateur d'accéder à ses notifications.
+
+En suivant ces étapes, vous pourrez implémenter une fonctionnalité de notifications sur votre site de rencontre Django, où l'utilisateur recevra des notifications chaque fois qu'il recevra un like sur sa photo ou une visite sur son profil, et pourra cliquer sur les notifications pour être redirigé vers le profil de l'utilisateur à l'origine de la notification.
+
+
+
+
+
+
+Pour transformer ce code HTML en un formulaire Django tout en respectant la structure HTML existante, vous pouvez suivre ces étapes :
+
+1. **Créer un modèle Django** : Définissez un modèle Django correspondant aux champs que vous avez dans votre formulaire HTML. Pour cet exemple, nous allons créer un modèle simple avec les champs `Age`, `Genre`, `Photo de profil`, `Centres d'intérêts` et `Description`.
+
+2. **Créer un formulaire Django** : Utilisez Django Forms pour créer un formulaire basé sur votre modèle.
+
+3. **Intégrer le formulaire dans une vue** : Créez une vue Django qui utilise le formulaire et gère la logique d'enregistrement des données.
+
+Voici comment cela pourrait être implémenté :
+
+### Modèles Django
+
+```python
+# models.py
+from django.db import models
+
+class Profil(models.Model):
+    AGE_CHOICES = [(i, i) for i in range(18, 61)]
+    SEXE_CHOICES = [
+        ('homme', 'Homme'),
+        ('femme', 'Femme'),
+    ]
+    INTEREST_CHOICES = [
+        ('football', 'Football'),
+        ('basketball', 'BasketBall'),
+        ('tennis', 'Tennis'),
+        ('voyage', 'Voyage'),
+        ('nature', 'Nature'),
+        ('musique', 'Musique'),
+        ('films', 'Films et Series TV'),
+        ('lecture', 'Lecture'),
+        ('footing', 'Footing'),
+        ('cuisine', 'Cuisine'),
+        ('jeux_videos', 'Jeux Vidéos'),
+        ('jeux_societe', 'Jeux de Sociétés'),
+        ('arts', 'Arts et Créations'),
+        ('blagues', 'Blagues'),
+        ('sexto', 'Sextos'),
+    ]
+
+    age = models.IntegerField(choices=AGE_CHOICES)
+    genre = models.CharField(max_length=10, choices=SEXE_CHOICES)
+    photo_profil = models.ImageField(upload_to='photos_profil/')
+    centres_interets = models.CharField(max_length=20, choices=INTEREST_CHOICES)
+    description = models.TextField()
+
+    def __str__(self):
+        return f'Profil {self.id}'
+```
+
+### Formulaires Django
+
+```python
+# forms.py
+from django import forms
+from .models import Profil
+
+class ProfilForm(forms.ModelForm):
+    class Meta:
+        model = Profil
+        fields = ['age', 'genre', 'photo_profil', 'centres_interets', 'description']
+        labels = {
+            'age': 'Age',
+            'genre': 'Je suis un/une',
+            'photo_profil': 'Importez une photo de profil',
+            'centres_interets': 'Vos centres d\'intérêts',
+            'description': 'Parlez nous un peu plus de vous',
+        }
+        widgets = {
+            'genre': forms.RadioSelect(choices=Profil.SEXE_CHOICES),
+            'centres_interets': forms.CheckboxSelectMultiple(choices=Profil.INTEREST_CHOICES),
+        }
+```
+
+### Vue Django
+
+```python
+# views.py
+from django.shortcuts import render, redirect
+from .forms import ProfilForm
+
+def inscription(request):
+    if request.method == 'POST':
+        form = ProfilForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('inscription_success')
+    else:
+        form = ProfilForm()
+    return render(request, 'inscription.html', {'form': form})
+
+def inscription_success(request):
+    return render(request, 'inscription_success.html')
+```
+
+### Template Django (inscription.html)
+
+Assurez-vous d'avoir un dossier `templates` à la racine de votre application Django, et à l'intérieur, créez le fichier `inscription.html` avec le contenu suivant :
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription | Venus</title>
+    <link rel="stylesheet" href="{% static 'css/Inscriptionv2.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="logo-name"><h2>Venus</h2></div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="inscription-content">
+            <div class="inscription-col1">
+                <div class="inp1">
+                    <h3 class="brand">Age:</h3>
+                    {{ form.age }}
+                </div>
+                <div class="inp2">
+                    <h3 class="brand">Je suis un/une :</h3>
+                    {{ form.genre }}
+                </div>
+                <div class="inp3">
+                    <h3>Importez une photo de profil :</h3>
+                    <img src="{{ form.photo_profil.value.url }}" alt="Image de profil" width="120" height="120">
+                    <div class="custom-import">
+                        {{ form.photo_profil }}
+                        <i class='bx bxs-camera'></i>
+                    </div>
+                </div>
+            </div>
+            <div class="inscription-col2">
+                <div class="inp4">
+                    <h3 class="brand">Vos centre d'intérêts</h3>
+                    <div class="ci">
+                        {{ form.centres_interets }}
+                    </div>
+                </div>
+                <div class="inp5">
+                    <h3 class="brand">Parlez nous un peu plus de vous</h3>
+                    {{ form.description }}
+                </div>
+                <button class="submit" type="submit">Envoyer</button>
+            </div>
+        </div>
+    </form>
+    <script src="{% static 'js/Inscriptionv2.js' %}"></script>
+</body>
+</html>
+```
+
+### Remarques :
+
+- Assurez-vous que vos fichiers statiques (`css`, `js`, `img`) sont correctement configurés dans les paramètres Django (`STATIC_URL`, `STATICFILES_DIRS`, `MEDIA_URL`, `MEDIA_ROOT`).
+- Le code utilise des widgets Django (`RadioSelect` et `CheckboxSelectMultiple`) pour les champs `genre` et `centres_interets`.
+- `csrf_token` est inclus pour la sécurité du formulaire.
+- La vue `inscription_success` doit avoir son propre template (`inscription_success.html`) pour afficher une page de confirmation d'inscription.
+
+En suivant ces étapes, vous pouvez intégrer votre formulaire HTML existant dans Django en utilisant les capacités de modèles, de formulaires et de vues de Django.
+
+
+
+Pour intégrer votre modèle `UserProfile` avec le modèle `Profil` que nous avons défini précédemment, vous pouvez procéder comme suit :
+
+### Nouveau Modèle Django `Profil`
+
+Vous pouvez modifier et étendre le modèle `Profil` pour inclure les champs du modèle `UserProfile`. Assurez-vous d'adapter les champs et les widgets Django selon vos besoins.
+
+```python
+# models.py
+from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+
+class Profil(models.Model):
+    AGE_CHOICES = [(i, i) for i in range(18, 61)]
+    SEXE_CHOICES = [
+        ('homme', 'Homme'),
+        ('femme', 'Femme'),
+    ]
+    INTEREST_CHOICES = [
+        ('football', 'Football'),
+        ('basketball', 'BasketBall'),
+        ('tennis', 'Tennis'),
+        ('voyage', 'Voyage'),
+        ('nature', 'Nature'),
+        ('musique', 'Musique'),
+        ('films', 'Films et Series TV'),
+        ('lecture', 'Lecture'),
+        ('footing', 'Footing'),
+        ('cuisine', 'Cuisine'),
+        ('jeux_videos', 'Jeux Vidéos'),
+        ('jeux_societe', 'Jeux de Sociétés'),
+        ('arts', 'Arts et Créations'),
+        ('blagues', 'Blagues'),
+        ('sexto', 'Sextos'),
+    ]
+
+    age = models.IntegerField(choices=AGE_CHOICES)
+    genre = models.CharField(max_length=10, choices=SEXE_CHOICES)
+    photo_profil = models.ImageField(upload_to='photos_profil/')
+    centres_interets = models.CharField(max_length=20, choices=INTEREST_CHOICES)
+    description = models.TextField()
+
+    nom = models.CharField(max_length=50)
+    prenom = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    presentation = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Only hash the password on creation
+            self.password = make_password(self.password)
+        super(Profil, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['email'], name='email_index'),
+        ]
+```
+
+### Formulaires Django
+
+Assurez-vous d'adapter le formulaire `ProfilForm` pour inclure tous les champs nécessaires à partir des deux modèles (`Profil` et `UserProfile`).
+
+```python
+# forms.py
+from django import forms
+from .models import Profil
+
+class ProfilForm(forms.ModelForm):
+    class Meta:
+        model = Profil
+        fields = ['age', 'genre', 'photo_profil', 'centres_interets', 'description', 'nom', 'prenom', 'email', 'password', 'presentation']
+        labels = {
+            'age': 'Age',
+            'genre': 'Je suis un/une',
+            'photo_profil': 'Importez une photo de profil',
+            'centres_interets': 'Vos centres d\'intérêts',
+            'description': 'Parlez nous un peu plus de vous',
+            'nom': 'Nom',
+            'prenom': 'Prénom',
+            'email': 'Email',
+            'password': 'Mot de passe',
+            'presentation': 'Présentation',
+        }
+        widgets = {
+            'genre': forms.RadioSelect(choices=Profil.SEXE_CHOICES),
+            'centres_interets': forms.CheckboxSelectMultiple(choices=Profil.INTEREST_CHOICES),
+            'password': forms.PasswordInput(),
+        }
+```
+
+### Vue Django
+
+Vous pouvez ajuster vos vues pour utiliser le formulaire `ProfilForm` et gérer la logique d'enregistrement des données comme précédemment expliqué.
+
+### Remarques supplémentaires :
+
+- **Synchronisation des modèles :** Assurez-vous que votre base de données est mise à jour après avoir modifié vos modèles en utilisant les commandes de migration Django (`python manage.py makemigrations` et `python manage.py migrate`).
+  
+- **Gestion des utilisateurs :** Si vous souhaitez utiliser ce modèle pour gérer des utilisateurs authentifiés, envisagez d'utiliser les fonctionnalités de gestion d'authentification de Django (`django.contrib.auth.models.User`).
+
+- **Sécurité :** Veillez à sécuriser les données sensibles comme les mots de passe en utilisant `make_password` fourni par Django pour hasher les mots de passe avant de les sauvegarder.
+
+En suivant ces étapes, vous devriez pouvoir intégrer les champs du modèle `UserProfile` avec le modèle `Profil` dans votre application Django, tout en conservant la structure et les fonctionnalités que vous avez spécifiées dans votre modèle initial.
+
+
+
+Pour gérer l'inscription sur deux pages et faire en sorte que les informations du deuxième formulaire soient ajoutées à la suite du premier dans la base de données, vous pouvez utiliser une approche basée sur les sessions Django pour stocker temporairement les données du premier formulaire jusqu'à ce que le deuxième formulaire soit soumis. Voici comment vous pouvez le faire :
+
+### Étape 1 : Créer les Modèles Django
+
+Vous pouvez conserver vos modèles `Profil` et `UserProfile` tels qu'ils sont. Assurez-vous simplement qu'ils contiennent tous les champs nécessaires pour les deux étapes d'inscription.
+
+### Étape 2 : Créer les Formulaires Django
+
+Pour gérer l'inscription en deux étapes, vous aurez besoin de deux formulaires différents : un pour la première page et un pour la deuxième page.
+
+#### Premier Formulaire (Première Page)
+
+```python
+# forms.py
+from django import forms
+from .models import Profil
+
+class ProfilPremierePageForm(forms.ModelForm):
+    class Meta:
+        model = Profil
+        fields = ['age', 'genre', 'photo_profil', 'centres_interets', 'description']
+        labels = {
+            'age': 'Age',
+            'genre': 'Je suis un/une',
+            'photo_profil': 'Importez une photo de profil',
+            'centres_interets': 'Vos centres d\'intérêts',
+            'description': 'Parlez nous un peu plus de vous',
+        }
+        widgets = {
+            'genre': forms.RadioSelect(choices=Profil.SEXE_CHOICES),
+            'centres_interets': forms.CheckboxSelectMultiple(choices=Profil.INTEREST_CHOICES),
+        }
+```
+
+#### Deuxième Formulaire (Deuxième Page)
+
+```python
+# forms.py
+from django import forms
+from .models import Profil
+
+class ProfilDeuxiemePageForm(forms.ModelForm):
+    class Meta:
+        model = Profil
+        fields = ['nom', 'prenom', 'email', 'password', 'presentation']
+        labels = {
+            'nom': 'Nom',
+            'prenom': 'Prénom',
+            'email': 'Email',
+            'password': 'Mot de passe',
+            'presentation': 'Présentation',
+        }
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+```
+
+### Étape 3 : Créer les Vues Django
+
+Vous aurez besoin de deux vues distinctes pour gérer chaque étape du processus d'inscription.
+
+#### Première Vue (Première Page)
+
+```python
+# views.py
+from django.shortcuts import render, redirect
+from django.http import HttpResponseBadRequest
+from django.contrib import messages
+from .forms import ProfilPremierePageForm
+
+def inscription_etape_un(request):
+    if request.method == 'POST':
+        form = ProfilPremierePageForm(request.POST, request.FILES)
+        if form.is_valid():
+            request.session['profil_data'] = form.cleaned_data  # Stocke les données dans la session
+            return redirect('inscription_etape_deux')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+    else:
+        form = ProfilPremierePageForm()
+    
+    return render(request, 'inscription_etape_un.html', {'form': form})
+
+```
+
+#### Deuxième Vue (Deuxième Page)
+
+```python
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import ProfilDeuxiemePageForm
+from .models import Profil
+
+def inscription_etape_deux(request):
+    if 'profil_data' not in request.session:
+        return HttpResponseBadRequest("Vous devez remplir la première page d'inscription.")
+
+    if request.method == 'POST':
+        form = ProfilDeuxiemePageForm(request.POST)
+        if form.is_valid():
+            profil_data = request.session.pop('profil_data')  # Récupère les données de la session
+            profil_data.update(form.cleaned_data)  # Combiner les données des deux formulaires
+            profil = Profil(**profil_data)
+            profil.save()
+            messages.success(request, "Inscription terminée avec succès !")
+            return redirect('inscription_success')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+    else:
+        form = ProfilDeuxiemePageForm()
+    
+    return render(request, 'inscription_etape_deux.html', {'form': form})
+```
+
+### Étape 4 : Créer les Templates HTML
+
+Vous aurez besoin de deux templates HTML correspondant à chaque étape du processus d'inscription.
+
+#### Template pour la Première Page (`inscription_etape_un.html`)
+
+```html
+<!-- inscription_etape_un.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - Étape 1</title>
+</head>
+<body>
+    <h2>Inscription - Étape 1</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Suivant</button>
+    </form>
+</body>
+</html>
+```
+
+#### Template pour la Deuxième Page (`inscription_etape_deux.html`)
+
+```html
+<!-- inscription_etape_deux.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - Étape 2</title>
+</head>
+<body>
+    <h2>Inscription - Étape 2</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Soumettre</button>
+    </form>
+</body>
+</html>
+```
+
+### Notes supplémentaires :
+
+- **Gestion de la session :** Utiliser `request.session` pour stocker temporairement les données du premier formulaire jusqu'à ce que le processus d'inscription soit terminé.
+  
+- **Validation :** Assurez-vous de valider chaque formulaire avant de procéder à l'enregistrement des données.
+
+- **Messages :** Utilisation de `messages` pour fournir des retours d'informations à l'utilisateur après chaque étape.
+
+En suivant ces étapes, vous pouvez implémenter un processus d'inscription en deux étapes dans Django, en assurant que les informations du deuxième formulaire sont enregistrées à la suite du premier dans la base de données.

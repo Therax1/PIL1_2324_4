@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="{% static 'css/SignUp.css' %}">
+</head> 
+<body>
+    <div class="container">
+        <div class="content">
+            <form method="post" action="{% url 'signup' %}">
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% csrf_token %}
+            <div class="col1">
+                <div class="div-name">
+                    <h3 class="name">Nom:</h3>
+                    <input type="text" name="first_name" id="namme" placeholder="Nom">
+                </div>
+                <div class="div-prenom">
+                    <h3 class="name">Prénom:</h3>
+                    <input type="text" name="last_name" id="pren" placeholder="Prénom">
+                </div>
+                <div class="div-mail">
+                    <h3 class="name">E-mail:</h3>
+                    <input type="email" name="username" id="name" placeholder="E-mail">
+                </div>
+            </div>
+            <div class="col2">
+                <div class="div-mdp">
+                    <h3 class="name">Mot de passe:</h3>
+                    <input type="password" name="password1" id="pwd" placeholder="Mot de passe">
+                </div>
+                <div class="div-agmdp">
+                    <h3 class="name">Retapez le Mot de passe:</h3>
+                    <input type="password" name="password2" id="pwd" placeholder="Retapez le Mot de passe">
+                </div>
+                <div class="div-accept">
+                    <input type="checkbox" name="politics" id="politics"> <p>J'accepte les politiques et confidentialités de <span class="brand">Venus</span></p>
+                </div>
+                <div class="div-button">
+                    <button type="submit" class="btn-submit">
+                        S'inscrire
+                    </button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
