@@ -1,0 +1,325 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #024296;
+}
+.depl{
+    text-align: center;
+}
+
+.man{
+    text-align: center;
+    height: 85px;
+    font-size: 20px;
+}
+.manh{
+    text-align: center;
+}
+.manhh{
+    text-align: center;
+}
+
+.man1{
+    color: #024296;
+}
+
+.man2{
+    color: #024296;
+}
+
+.man3{
+    color: #024296;
+}
+
+.man4{
+    color: #024296;
+}
+
+.man5{
+    color: #024296;
+}
+
+.man6{
+    color: #024296;
+}
+
+.man7{
+    color: #024296;
+    text-align: center;
+}
+
+.des1{
+    color: #024296;
+    text-align: center;
+}
+
+.des2{
+    color: #024296;
+    text-align: center;
+}
+
+.des3{
+    color: #024296;
+    text-align: center;
+}
+
+header {
+    background: #186cbb;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    position: relative;
+}
+.git{
+    color: #024296;
+}
+.intr{
+    text-align: center;
+}
+
+.flux{
+    width: 1260px;
+    height: auto;
+    border: 2px solid #024296;
+    border radius:8px;
+    box-shadow:2px 2px 5px rgba(0,0,0,0.5);
+}
+
+.logo-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.logo {
+    height: 100px;
+    margin: auto;
+}
+
+.logo.left {
+   
+    padding-right: 1000px;
+}
+
+.logo.right {
+  
+  
+}
+
+header h1, header h2 {
+   position: relative;
+   margin-bottom: -55px;
+   
+}
+
+.ifri{
+    position: relative;
+    right: 380px;
+    top: -110px;
+    font-size: 9px;
+}
+
+.ifri1{
+    position: relative;
+    right: 387px;
+    top: -68px;
+    font-size: 9px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.ifri2{
+    position: relative;
+    left: 380px;
+    top: -125px;
+    font-size: 9px;
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 10px;
+}
+.ifri3{
+    position: relative;
+    left: 380px;
+    top: -69px;
+    font-size: 9px;
+    font-family: Arial;
+    font-size:10px ;
+ 
+}
+
+main {
+    padding: 1rem 2rem;
+}
+
+.rar{
+    text-align: center;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.dyn{
+    text-align: center;
+}
+
+.obj{
+    text-align: center;
+}
+
+.fonc{
+    text-align: center;
+}
+.des{
+    text-align: center;
+}
+h3 {
+    color: #024296;
+}
+
+.tec{
+    text-align: center;
+}
+
+.pla{
+    text-align: center;
+}
+.bud{
+    text-align: center;
+}
+.del{
+    text-align: center;
+}
+
+section {
+    margin-bottom: 4.5rem;
+    background: #fdfdfd;
+    padding: 10px;
+    text-align: unset;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+.les{
+    margin-bottom: 4.5rem;
+    background: #f9f9fa;
+    padding: 10px;
+    text-align: unset;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+.palette{
+    height: 10px;
+    text-align: center;
+}
+
+.les .frame{
+    margin-bottom: 1;
+    padding-bottom: 5px ;
+}
+.membre{
+    text-align:center;
+    padding-top: -20px;
+    padding-bottom: 20px;
+    
+}
+.noms1{
+    text-align: left;
+    margin-left: 240px;
+    
+}
+.noms2{
+    right: -800px;
+    position: relative;
+    margin-right: 400px;
+    margin-top: -142.5px;
+}  
+.tra{
+    text-align: center;
+} 
+.nu1{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    color: rgba(10, 46, 206);
+}
+.nu2{
+    color:rgba(10, 46, 206); 
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    
+}
+.nu3{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+.nu4{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+.nu5{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+.nu6{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color:rgba(10, 46, 206);
+}
+.nu7{
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+.nu8{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+.nu9{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+.nu10{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 25px;
+    background: #fff;
+    margin-bottom: -10px;
+    color: rgba(10, 46, 206);
+}
+
+.cible{
+    text-align: center;
+}
+
+footer {
+    position: responsive;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px 0;
+    
+}
